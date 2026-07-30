@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'accounts',
-    'wallet',
+    'wallet.apps.WalletConfig',
     'transactions',
     'fraud_detection',
 ]
