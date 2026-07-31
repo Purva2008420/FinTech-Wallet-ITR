@@ -5,3 +5,9 @@ class WalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet
         fields = ["wallet_number", "balance", "created_at"]
+
+class AddMoneySerializer(serializers.Serializer):
+    amount = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
