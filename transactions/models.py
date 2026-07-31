@@ -18,6 +18,20 @@ class Transaction(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sent_transactions",
+        null=True,
+        blank=True
+    )
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="received_transactions",
+        null=True,
+        blank=True
+    )
     transaction_type = models.CharField(
         max_length=20,
         choices=TRANSACTION_TYPES
