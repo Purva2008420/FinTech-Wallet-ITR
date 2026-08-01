@@ -55,3 +55,32 @@ class AdminDashboardView(APIView):
             "total_balance": total_balance,
             "latest_transactions": serializer.data
         })
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .authentication import CustomTokenObtainPairSerializer
+
+class CustomLoginView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+from django.shortcuts import get_object_or_404
+from .permissions import IsAdminUserCustom
+
+class FreezeUserView(APIView):
+    permission_classes = [IsAdminUserCustom]
+
+    def post(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        user.is_frozen = True
+        user.save()
+        return Response({
+            "message": f"{user.username} has been frozen."
+        })
+
+class UnfreezeUserView(APIView):
+    permission_classes = [IsAdminUserCustom]
+
+    def post(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        user.is_frozen = False
+        user.save()
+        return Response({
+            "message": f"{user.username} has been unfrozen."
+        })

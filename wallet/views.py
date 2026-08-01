@@ -14,13 +14,26 @@ class WalletDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        if request.user.is_frozen:
+            return Response(
+                {"error": "Your account has been frozen. Please contact the administrator."},
+                status=403
+            )
+
         serializer = WalletSerializer(request.user.wallet)
         return Response(serializer.data)
+
 
 class AddMoneyView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        if request.user.is_frozen:
+            return Response(
+                {"error": "Your account has been frozen. Please contact the administrator."},
+                status=403
+            )
+
         serializer = AddMoneySerializer(data=request.data)
         if serializer.is_valid():
             amount = serializer.validated_data["amount"]
@@ -44,6 +57,12 @@ class TransferMoneyView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        if request.user.is_frozen:
+            return Response(
+                {"error": "Your account has been frozen. Please contact the administrator."},
+                status=403
+            )
+
         serializer = TransferSerializer(data=request.data)
 
         if serializer.is_valid():
