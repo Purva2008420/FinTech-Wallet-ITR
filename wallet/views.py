@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -7,6 +8,7 @@ from django.contrib.auth import get_user_model
 from .models import Wallet
 from .serializers import WalletSerializer, AddMoneySerializer, TransferSerializer
 from transactions.models import Transaction
+from fraud_detection.services import detect_fraud
 
 User = get_user_model()
 
@@ -44,12 +46,15 @@ class AddMoneyView(APIView):
             wallet.balance += Decimal(amount)
             wallet.save()
 
-            Transaction.objects.create(
+            transaction = Transaction.objects.create(
                 user=request.user,
                 transaction_type="DEPOSIT",
                 amount=amount,
+                status="SUCCESS",
                 description="Money added to wallet"
             )
+
+            detect_fraud(transaction)
             return Response({"message": "Money added successfully.", "new_balance": wallet.balance})
         return Response(serializer.errors, status=400)
 
@@ -99,7 +104,7 @@ class TransferMoneyView(APIView):
                 receiver_wallet.save()
 
                 # Audit record for Sender
-                Transaction.objects.create(
+                sender_transaction = Transaction.objects.create(
                     user=request.user,
                     sender=request.user,
                     receiver=receiver,
@@ -107,6 +112,8 @@ class TransferMoneyView(APIView):
                     amount=amount,
                     description=f"Transferred to {receiver.username}"
                 )
+
+                detect_fraud(sender_transaction)
 
                 # Audit record for Recipient
                 Transaction.objects.create(
