@@ -25,12 +25,12 @@ class ProfileView(APIView):
             "phone": request.user.phone
         })
 User = get_user_model()
+from fraud_detection.models import FraudAlert
 
 class AdminDashboardView(APIView):
     permission_classes = [IsAdminUserCustom]
 
     def get(self, request):
-
         total_users = User.objects.count()
         total_wallets = Wallet.objects.count()
         total_transactions = Transaction.objects.count()
@@ -39,22 +39,27 @@ class AdminDashboardView(APIView):
             total=Sum("balance")
         )["total"] or 0
 
-        latest_transactions = Transaction.objects.order_by(
-            "-created_at"
-        )[:5]
+        # Day 13 Core: Real-time fraud metrics calculations
+        total_alerts = FraudAlert.objects.count()
+        resolved_alerts = FraudAlert.objects.filter(is_resolved=True).count()
+        pending_alerts = FraudAlert.objects.filter(is_resolved=False).count()
 
-        serializer = TransactionSerializer(
-            latest_transactions,
-            many=True
-        )
+        latest_transactions = Transaction.objects.order_by("-created_at")[:5]
+        serializer = TransactionSerializer(latest_transactions, many=True)
 
         return Response({
             "total_users": total_users,
             "total_wallets": total_wallets,
             "total_transactions": total_transactions,
             "total_balance": total_balance,
+            "total_fraud_alerts": total_alerts,
+            "resolved_alerts": resolved_alerts,
+            "pending_alerts": pending_alerts,
             "latest_transactions": serializer.data
         })
+
+
+
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .authentication import CustomTokenObtainPairSerializer
 
