@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Wallet from "./pages/Wallet";
+import Transfer from "./pages/Transfer";
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
           {/* Fallback Catch-All Router Target */}
           <Route path="*" element={<Navigate to="/login" replace />} />
           <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
+          <Route path="/transfer" element={<ProtectedRoute><Transfer /></ProtectedRoute>} />
+
         </Routes>
       </Router>
     </AuthProvider>

@@ -47,7 +47,7 @@ const Dashboard = () => {
                         <div className="col-md-3">
                             <div className="card shadow-sm border-0 bg-white p-3" style={{ borderRadius: "12px" }}>
                                 <span className="text-muted small fw-semibold text-uppercase">Wallet Balance</span>
-                                <h2 className="fw-bold text-primary my-2">I{stats.balance}</h2>
+                               <h2 className="fw-bold text-primary my-2">₹{stats.balance}</h2>
                                 <Link to="/wallet" className="small text-decoration-none fw-bold">Manage Funds →</Link>
                             </div>
                         </div>
