@@ -1,0 +1,37 @@
+.container {
+    max-width: 1300px;
+}
+
+.dashboard-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+.badge {
+    font-size: 0.85rem;
+}
+
+.btn {
+    min-width: 90px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}

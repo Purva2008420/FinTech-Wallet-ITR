@@ -6,7 +6,7 @@ from .views import (
     AdminDashboardView,
     CustomLoginView,
     FreezeUserView,
-    UnfreezeUserView
+    UnfreezeUserView, UserListView
 )
 
 urlpatterns = [
@@ -18,4 +18,5 @@ urlpatterns = [
 
     path("freeze/<int:user_id>/", FreezeUserView.as_view(), name="freeze_user"),
     path("unfreeze/<int:user_id>/", UnfreezeUserView.as_view(), name="unfreeze_user"),
+    path("users/", UserListView.as_view(), name="user-list"),
 ]

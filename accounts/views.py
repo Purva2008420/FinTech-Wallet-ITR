@@ -11,6 +11,7 @@ from transactions.models import Transaction
 from transactions.serializers import TransactionSerializer
 from .permissions import IsAdminUserCustom
 
+
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -89,3 +90,14 @@ class UnfreezeUserView(APIView):
         return Response({
             "message": f"{user.username} has been unfrozen."
         })
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAdminUser
+
+from .models import User
+from .serializers import UserListSerializer
+
+
+class UserListView(ListAPIView):
+    queryset = User.objects.all().order_by("id")
+    serializer_class = UserListSerializer
+    permission_classes = [IsAdminUser]

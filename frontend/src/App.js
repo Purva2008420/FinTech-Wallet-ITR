@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Wallet from "./pages/Wallet";
 import Transfer from "./pages/Transfer";
 import Transactions from "./pages/Transactions";
+import AdminDashboard from "./pages/AdminDashboard";
 function App() {
   return (
     <AuthProvider>
@@ -30,6 +31,7 @@ function App() {
           <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
           <Route path="/transfer" element={<ProtectedRoute><Transfer /></ProtectedRoute>} />
           <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+          <Route path="/admin" element={<AdminDashboard />}/>
 
         </Routes>
       </Router>
