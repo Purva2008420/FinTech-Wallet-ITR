@@ -14,12 +14,16 @@ const Dashboard = () => {
             try {
                 // Fetch wallet balance data
                 const walletRes = await api.get("wallet/");
+
                 // Fetch user transaction history list
                 const txRes = await api.get("transactions/");
 
+                // DRF might return an object with results or a raw array
+                const logs = txRes.data.results || txRes.data;
+
                 setStats({
                     balance: walletRes.data.balance,
-                    transactionsCount: txRes.data.count || txRes.data.results?.length || txRes.data.length || 0
+                    transactionsCount: Array.isArray(logs) ? logs.length : 0
                 });
             } catch (err) {
                 console.error("Error fetching metrics:", err);
@@ -47,21 +51,21 @@ const Dashboard = () => {
                         <div className="col-md-3">
                             <div className="card shadow-sm border-0 bg-white p-3" style={{ borderRadius: "12px" }}>
                                 <span className="text-muted small fw-semibold text-uppercase">Wallet Balance</span>
-                               <h2 className="fw-bold text-primary my-2">₹{stats.balance}</h2>
+                                <h2 className="fw-bold text-primary my-2">₹{stats.balance}</h2>
                                 <Link to="/wallet" className="small text-decoration-none fw-bold">Manage Funds →</Link>
                             </div>
                         </div>
 
-                        {/* Card 2: Total transactions ledger counter */}
+                        {/* Card 2: Total transactions counter */}
                         <div className="col-md-3">
                             <div className="card shadow-sm border-0 bg-white p-3" style={{ borderRadius: "12px" }}>
                                 <span className="text-muted small fw-semibold text-uppercase">Transactions</span>
                                 <h2 className="fw-bold text-dark my-2">{stats.transactionsCount}</h2>
-                                <span className="small text-muted">Active audit trail cards</span>
+                                <Link to="/transactions" className="small text-decoration-none fw-bold text-secondary">View Statement →</Link>
                             </div>
                         </div>
 
-                        {/* Card 3: Account status condition badge */}
+                        {/* Card 3: Account status */}
                         <div className="col-md-3">
                             <div className="card shadow-sm border-0 bg-white p-3" style={{ borderRadius: "12px" }}>
                                 <span className="text-muted small fw-semibold text-uppercase">Account Status</span>
@@ -70,7 +74,7 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        {/* Card 4: Automated risk defense shield engine state */}
+                        {/* Card 4: Automated risk defense shield state */}
                         <div className="col-md-3">
                             <div className="card shadow-sm border-0 bg-white p-3" style={{ borderRadius: "12px" }}>
                                 <span className="text-muted small fw-semibold text-uppercase">Fraud Shield</span>
@@ -86,8 +90,8 @@ const Dashboard = () => {
                     <h5 className="fw-bold mb-3 text-dark">Quick Operations</h5>
                     <div className="d-flex gap-3 flex-wrap">
                         <Link to="/wallet" className="btn btn-primary px-4 py-2 fw-bold">👛 Load Money</Link>
-                        <button className="btn btn-outline-secondary px-4 py-2 fw-bold" disabled>💸 Transfer Money (Day 16)</button>
-                        <button className="btn btn-outline-secondary px-4 py-2 fw-bold" disabled>📜 Statement Logs (Day 17)</button>
+                        <Link to="/transfer" className="btn btn-outline-primary px-4 py-2 fw-bold">💸 Transfer Money</Link>
+                        <Link to="/transactions" className="btn btn-outline-secondary px-4 py-2 fw-bold">📜 Statement Logs</Link>
                     </div>
                 </div>
             </div>
@@ -96,4 +100,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
 

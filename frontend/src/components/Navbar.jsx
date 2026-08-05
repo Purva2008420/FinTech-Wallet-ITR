@@ -25,6 +25,8 @@ const Navbar = () => {
                     <Link className={`nav-link ${isActive("/dashboard")}`} to="/dashboard">Dashboard</Link>
                     <Link className={`nav-link ${isActive("/wallet")}`} to="/wallet">Wallet</Link>
                      <Link className={`nav-link ${isActive("/transfer")}`} to="/transfer">Transfer</Link>
+                    <Link className={`nav-link ${isActive("/transactions")}`} to="/transactions">Transactions</Link>
+
                 </div>
                 <div className="d-flex align-items-center gap-3">
                     <span className="text-white small fw-bold">👤 {user.username}</span>

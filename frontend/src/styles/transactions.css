@@ -1,0 +1,25 @@
+.container {
+    max-width: 1200px;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+.badge {
+    font-size: 0.85rem;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+input,
+select {
+    min-height: 45px;
+}
