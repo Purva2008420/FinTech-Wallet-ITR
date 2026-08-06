@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'wallet.apps.WalletConfig',
     'transactions',
     'fraud_detection',
+    'analytics',
+    'profile_api',
 ]
 
 MIDDLEWARE = [

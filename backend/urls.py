@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/accounts/", include("accounts.urls")),
     path("api/wallet/", include("wallet.urls")),
     path("api/transactions/", include("transactions.urls")),
-    path( "api/fraud-alerts/",include("fraud_detection.urls"),
-),
+    path("api/fraud-alerts/", include("fraud_detection.urls")),
+    path("api/analytics/", include("analytics.urls")),
+    path("api/profile/",include("profile_api.urls"),),
 ]

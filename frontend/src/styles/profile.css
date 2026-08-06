@@ -1,0 +1,23 @@
+.container{
+    max-width:900px;
+}
+
+.card{
+    border-radius:12px;
+}
+
+.card-header{
+    font-weight:bold;
+}
+
+.modal{
+    background:rgba(0,0,0,0.45);
+}
+
+.modal-content{
+    border-radius:12px;
+}
+
+.btn{
+    min-width:130px;
+}

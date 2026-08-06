@@ -131,3 +131,4 @@ class TransferMoneyView(APIView):
             })
 
         return Response(serializer.errors, status=400)
+

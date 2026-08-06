@@ -101,3 +101,4 @@ class UserListView(ListAPIView):
     queryset = User.objects.all().order_by("id")
     serializer_class = UserListSerializer
     permission_classes = [IsAdminUser]
+
