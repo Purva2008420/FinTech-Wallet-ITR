@@ -27,6 +27,8 @@ const Transactions = () => {
   const [typeFilter, setTypeFilter] = useState("ALL");
 
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [dateFrom, setDateFrom] = useState("");
+const [dateTo, setDateTo] = useState("");
 
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
@@ -97,24 +99,56 @@ const Transactions = () => {
   // Search
   // ==========================
 
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredTransactions(transactions);
-      return;
-    }
+ useEffect(() => {
+  const keyword = searchTerm.trim().toLowerCase();
 
-    const keyword = searchTerm.toLowerCase();
+  const filtered = transactions.filter((tx) => {
 
-    const filtered = transactions.filter((tx) => {
-      return (
-        tx.description?.toLowerCase().includes(keyword) ||
-        tx.sender?.toLowerCase().includes(keyword) ||
-        tx.receiver?.toLowerCase().includes(keyword)
-      );
-    });
+    // -------------------------
+    // Search filter
+    // -------------------------
 
-    setFilteredTransactions(filtered);
-  }, [searchTerm, transactions]);
+    const matchesSearch =
+      !keyword ||
+      tx.description?.toLowerCase().includes(keyword) ||
+      tx.sender?.toLowerCase().includes(keyword) ||
+      tx.receiver?.toLowerCase().includes(keyword) ||
+      tx.transaction_type?.toLowerCase().includes(keyword);
+
+    // -------------------------
+    // Date filter
+    // -------------------------
+
+    const transactionDate = tx.created_at
+      ? new Date(tx.created_at)
+      : null;
+
+    const fromDate = dateFrom
+      ? new Date(`${dateFrom}T00:00:00`)
+      : null;
+
+    const toDate = dateTo
+      ? new Date(`${dateTo}T23:59:59`)
+      : null;
+
+    const matchesFromDate =
+      !fromDate ||
+      (transactionDate && transactionDate >= fromDate);
+
+    const matchesToDate =
+      !toDate ||
+      (transactionDate && transactionDate <= toDate);
+
+    return (
+      matchesSearch &&
+      matchesFromDate &&
+      matchesToDate
+    );
+  });
+
+  setFilteredTransactions(filtered);
+
+}, [searchTerm, dateFrom, dateTo, transactions]);
 
   // ==========================
   // View Details
@@ -132,7 +166,103 @@ const Transactions = () => {
       alert("Unable to fetch transaction details.");
     }
   };
+// ==========================
+// Export Transactions to CSV
+// ==========================
 
+const exportToCSV = () => {
+  if (filteredTransactions.length === 0) {
+    alert("No transactions available to export.");
+    return;
+  }
+
+  const headers = [
+    "Date",
+    "Transaction Type",
+    "Amount",
+    "Status",
+    "Description",
+    "Sender",
+    "Receiver",
+  ];
+
+  const rows = filteredTransactions.map((tx) => [
+    tx.created_at
+      ? new Date(tx.created_at).toLocaleString()
+      : "",
+
+    tx.transaction_type || "",
+
+    tx.amount || "",
+
+    tx.status || "",
+
+    tx.description || "",
+
+    tx.sender || "",
+
+    tx.receiver || "",
+  ]);
+
+  const summaryRows = [
+    ["FINTECH WALLET - TRANSACTION STATEMENT"],
+    [],
+    ["Total Transactions", totalTransactions],
+    ["Total Amount", totalAmount.toFixed(2)],
+    ["Successful Transactions", successfulTransactions],
+    ["Failed Transactions", failedTransactions],
+    [],
+  ];
+
+  const csvContent = [
+    ...summaryRows,
+    headers,
+    ...rows,
+  ]
+    .map((row) =>
+      row
+        .map((value) => {
+          const text = String(value ?? "").replace(/"/g, '""');
+          return `"${text}"`;
+        })
+        .join(",")
+    )
+    .join("\n");
+
+  const blob = new Blob(
+    [csvContent],
+    {
+      type: "text/csv;charset=utf-8;",
+    }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "fintech_transaction_statement.csv";
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+};
+// ==========================
+// Print Transaction Statement
+// ==========================
+
+const printStatement = () => {
+  if (filteredTransactions.length === 0) {
+    alert("No transactions available to print.");
+    return;
+  }
+
+  window.print();
+};
   // ==========================
   // Pagination
   // ==========================
@@ -148,7 +278,24 @@ const Transactions = () => {
       loadTransactions(currentPage + 1);
     }
   };
+// ==========================
+// Transaction Summary
+// ==========================
 
+const totalTransactions = filteredTransactions.length;
+
+const totalAmount = filteredTransactions.reduce(
+  (total, tx) => total + Number(tx.amount || 0),
+  0
+);
+
+const successfulTransactions = filteredTransactions.filter(
+  (tx) => tx.status?.toUpperCase() === "SUCCESS"
+).length;
+
+const failedTransactions = filteredTransactions.filter(
+  (tx) => tx.status?.toUpperCase() === "FAILED"
+).length;
   // ==========================
   // Status Badge
   // ==========================
@@ -190,92 +337,286 @@ const Transactions = () => {
 
       <div className="card shadow">
 
-        <div className="card-header bg-primary text-white">
-          <h3 className="mb-0">
-            Transaction History
-          </h3>
-        </div>
+       <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+
+  <h3 className="mb-0">
+    Transaction History
+  </h3>
+
+  <button
+    type="button"
+    className="btn btn-light"
+    onClick={exportToCSV}
+  >
+    📥 Export CSV
+  </button>
+  <button
+  type="button"
+  className="btn btn-light ms-2"
+  onClick={printStatement}
+>
+  📄 Download PDF
+</button>
+</div>
 
         <div className="card-body">
+{/* Transaction Summary */}
 
+<div className="row mb-4">
+
+  {/* Total Transactions */}
+
+  <div className="col-md-3 mb-3">
+
+    <div className="card shadow-sm h-100 transaction-summary-card">
+
+      <div className="card-body">
+
+        <h6 className="text-muted">
+          Total Transactions
+        </h6>
+
+        <h3 className="mb-0">
+          {totalTransactions}
+        </h3>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* Total Amount */}
+
+  <div className="col-md-3 mb-3">
+
+    <div className="card shadow-sm h-100 transaction-summary-card">
+
+      <div className="card-body">
+
+        <h6 className="text-muted">
+          Total Amount
+        </h6>
+
+        <h3 className="mb-0">
+          ₹{totalAmount.toFixed(2)}
+        </h3>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* Successful */}
+
+  <div className="col-md-3 mb-3">
+
+    <div className="card shadow-sm h-100 transaction-summary-card">
+
+      <div className="card-body">
+
+        <h6 className="text-muted">
+          Successful
+        </h6>
+
+        <h3 className="mb-0">
+          {successfulTransactions}
+        </h3>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* Failed */}
+
+  <div className="col-md-3 mb-3">
+
+    <div className="card shadow-sm h-100 transaction-summary-card">
+
+      <div className="card-body">
+
+        <h6 className="text-muted">
+          Failed
+        </h6>
+
+        <h3 className="mb-0">
+          {failedTransactions}
+        </h3>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
           {/* Search & Filters */}
 
-          <div className="row mb-4">
+<div className="row mb-4">
 
-            <div className="col-md-4 mb-2">
+  {/* Search */}
 
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Search by description, sender or receiver..."
-                value={searchTerm}
-                onChange={(e) =>
-                  setSearchTerm(e.target.value)
-                }
-              />
+  <div className="col-md-4 mb-2">
 
-            </div>
+    <label className="form-label">
+      Search
+    </label>
 
-            <div className="col-md-4 mb-2">
+    <input
+      type="text"
+      className="form-control"
+      placeholder="Search transactions..."
+      value={searchTerm}
+      onChange={(e) =>
+        setSearchTerm(e.target.value)
+      }
+    />
 
-              <select
-                className="form-select"
-                value={typeFilter}
-                onChange={(e) =>
-                  setTypeFilter(e.target.value)
-                }
-              >
-                <option value="ALL">
-                  All Types
-                </option>
+  </div>
 
-                <option value="DEPOSIT">
-                  Deposit
-                </option>
 
-                <option value="TRANSFER">
-                  Transfer
-                </option>
+  {/* Transaction Type */}
 
-                <option value="WITHDRAW">
-                  Withdraw
-                </option>
+  <div className="col-md-4 mb-2">
 
-              </select>
+    <label className="form-label">
+      Transaction Type
+    </label>
 
-            </div>
+    <select
+      className="form-select"
+      value={typeFilter}
+      onChange={(e) =>
+        setTypeFilter(e.target.value)
+      }
+    >
 
-            <div className="col-md-4 mb-2">
+      <option value="ALL">
+        All Types
+      </option>
 
-              <select
-                className="form-select"
-                value={statusFilter}
-                onChange={(e) =>
-                  setStatusFilter(e.target.value)
-                }
-              >
-                <option value="ALL">
-                  All Status
-                </option>
+      <option value="DEPOSIT">
+        Deposit
+      </option>
 
-                <option value="SUCCESS">
-                  SUCCESS
-                </option>
+      <option value="TRANSFER">
+        Transfer
+      </option>
 
-                <option value="FAILED">
-                  FAILED
-                </option>
+      <option value="WITHDRAW">
+        Withdraw
+      </option>
 
-                <option value="PENDING">
-                  PENDING
-                </option>
+    </select>
 
-              </select>
+  </div>
 
-            </div>
 
-          </div>
+  {/* Status */}
 
+  <div className="col-md-4 mb-2">
+
+    <label className="form-label">
+      Status
+    </label>
+
+    <select
+      className="form-select"
+      value={statusFilter}
+      onChange={(e) =>
+        setStatusFilter(e.target.value)
+      }
+    >
+
+      <option value="ALL">
+        All Status
+      </option>
+
+      <option value="SUCCESS">
+        SUCCESS
+      </option>
+
+      <option value="FAILED">
+        FAILED
+      </option>
+
+      <option value="PENDING">
+        PENDING
+      </option>
+
+    </select>
+
+  </div>
+
+
+  {/* From Date */}
+
+  <div className="col-md-4 mb-2">
+
+    <label className="form-label">
+      From Date
+    </label>
+
+    <input
+      type="date"
+      className="form-control"
+      value={dateFrom}
+      onChange={(e) =>
+        setDateFrom(e.target.value)
+      }
+    />
+
+  </div>
+
+
+  {/* To Date */}
+
+  <div className="col-md-4 mb-2">
+
+    <label className="form-label">
+      To Date
+    </label>
+
+    <input
+      type="date"
+      className="form-control"
+      value={dateTo}
+      onChange={(e) =>
+        setDateTo(e.target.value)
+      }
+    />
+
+  </div>
+
+
+  {/* Reset */}
+
+  <div className="col-md-4 mb-2 d-flex align-items-end">
+
+    <button
+      type="button"
+      className="btn btn-secondary w-100"
+      onClick={() => {
+        setSearchTerm("");
+        setTypeFilter("ALL");
+        setStatusFilter("ALL");
+        setDateFrom("");
+        setDateTo("");
+        setCurrentPage(1);
+      }}
+    >
+      Reset Filters
+    </button>
+
+  </div>
+
+</div>
           {/* Loading */}
 
           {loading && (
@@ -330,7 +671,8 @@ const Transactions = () => {
 
             <div className="table-responsive">
 
-              <table className="table table-hover align-middle">
+              <div className="table-responsive">
+                <table className="table table-hover align-middle">
 
                 <thead className="table-dark">
 
@@ -413,7 +755,7 @@ const Transactions = () => {
                 </tbody>
 
               </table>
-
+              </div>
             </div>
 
           )}           {/* Pagination */}
