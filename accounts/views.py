@@ -23,7 +23,8 @@ class ProfileView(APIView):
         return Response({
             "username": request.user.username,
             "email": request.user.email,
-            "phone": request.user.phone
+            "phone": request.user.phone,
+            "is_staff": request.user.is_staff
         })
 User = get_user_model()
 from fraud_detection.models import FraudAlert

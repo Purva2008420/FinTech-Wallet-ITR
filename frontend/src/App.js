@@ -12,6 +12,7 @@ import Transactions from "./pages/Transactions";
 import AdminDashboard from "./pages/AdminDashboard";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import Profile from "./pages/Profile";
+import FraudReview from "./pages/FraudReview";
 function App() {
   return (
     <AuthProvider>
@@ -36,6 +37,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />}/>
           <Route path="/analytics" element={<AnalyticsDashboard />}/>
           <Route path="/profile" element={<Profile />}/>
+          <Route path="/fraud-review" element={<ProtectedRoute adminOnly><FraudReview /></ProtectedRoute>}/>
         </Routes>
       </Router>
     </AuthProvider>

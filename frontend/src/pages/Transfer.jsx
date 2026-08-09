@@ -68,12 +68,23 @@ const Transfer = () => {
                 amount: transferAmount
             });
 
-            setMessage(res.data.message || "Transfer completed successfully.");
-            setReceiverUsername("");
-            setAmount("");
+            const transactionStatus = res.data.status;
 
-            // Step 4 instant ledger balance update
-            await fetchBalanceAndLogs();
+if (transactionStatus === "SUCCESS") {
+    setMessage("🟢 SUCCESS: " + res.data.message);
+} else if (transactionStatus === "PENDING") {
+    setMessage("🟡 PENDING: " + res.data.message);
+} else if (transactionStatus === "FAILED") {
+    setMessage("🔴 FAILED: " + res.data.message);
+} else {
+    setMessage(res.data.message || "Transaction completed.");
+}
+
+setReceiverUsername("");
+setAmount("");
+
+// Refresh balance and transaction history
+await fetchBalanceAndLogs();
         } catch (err) {
             // Step 5 error alert formatting strings mapping
             setError(err.response?.data?.error || "Transaction declined. Check receiver profile status.");

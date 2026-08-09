@@ -64,38 +64,125 @@ class TransferMoneyView(APIView):
     def post(self, request):
         if request.user.is_frozen:
             return Response(
-                {"error": "Your account has been frozen. Please contact the administrator."},
+                {
+                    "error": "Your account has been frozen. Please contact the administrator."
+                },
                 status=403
             )
 
         serializer = TransferSerializer(data=request.data)
 
         if serializer.is_valid():
-            receiver_username = str(serializer.validated_data["receiver_username"])
-            amount = Decimal(serializer.validated_data["amount"])
+            receiver_username = str(
+                serializer.validated_data["receiver_username"]
+            )
+            amount = Decimal(
+                serializer.validated_data["amount"]
+            )
 
-            # 1. Validation: Block zero or negative values
+            # 1. Validate amount
             if amount <= 0:
-                return Response({"error": "Amount must be greater than zero."}, status=400)
+                return Response(
+                    {"error": "Amount must be greater than zero."},
+                    status=400
+                )
 
-            # 2. Validation: Prevent self-transfer
+            # 2. Prevent self-transfer
             if receiver_username == request.user.username:
-                return Response({"error": "You cannot transfer money to yourself."}, status=400)
+                return Response(
+                    {"error": "You cannot transfer money to yourself."},
+                    status=400
+                )
 
-            # 3. Validation: Verify recipient account exists
+            # 3. Find receiver
             try:
-                receiver = User.objects.get(username=receiver_username)
+                receiver = User.objects.get(
+                    username=receiver_username
+                )
             except User.DoesNotExist:
-                return Response({"error": "Receiver not found."}, status=404)
+                return Response(
+                    {"error": "Receiver not found."},
+                    status=404
+                )
 
+            # 4. Get wallets
             sender_wallet = request.user.wallet
             receiver_wallet = receiver.wallet
 
-            # 4. Validation: Verify sender has enough funds
+            # 5. Check balance
             if sender_wallet.balance < amount:
-                return Response({"error": "Insufficient balance."}, status=400)
+                failed_transaction = Transaction.objects.create(
+                    user=request.user,
+                    sender=request.user,
+                    receiver=receiver,
+                    transaction_type="TRANSFER",
+                    amount=amount,
+                    status="FAILED",
+                    description="Transfer failed: Insufficient balance."
+                )
 
-            # Safe database execution block
+                return Response(
+                    {
+                        "message": "Transaction failed.",
+                        "status": "FAILED",
+                        "error": "Insufficient balance.",
+                        "transaction_id": failed_transaction.id,
+                        "balance": sender_wallet.balance
+                    },
+                    status=400
+                )
+
+            # 6. Create transaction for fraud checking
+            transaction_record = Transaction.objects.create(
+                user=request.user,
+                sender=request.user,
+                receiver=receiver,
+                transaction_type="TRANSFER",
+                amount=amount,
+                status="PENDING",
+                description="Transaction under fraud review."
+            )
+
+            # 7. Run fraud detection
+            decision = detect_fraud(transaction_record)
+
+            # 8. HIGH risk → FAILED
+            if decision == "FAILED":
+                transaction_record.status = "FAILED"
+                transaction_record.description = (
+                    "Transaction failed due to high fraud risk."
+                )
+                transaction_record.save()
+
+                return Response(
+                    {
+                        "message": "Transaction failed due to fraud detection.",
+                        "status": "FAILED",
+                        "transaction_id": transaction_record.id,
+                        "balance": sender_wallet.balance
+                    },
+                    status=200
+                )
+
+            # 9. MEDIUM risk → PENDING
+            if decision == "PENDING":
+                transaction_record.status = "PENDING"
+                transaction_record.description = (
+                    "Transaction is pending for security review."
+                )
+                transaction_record.save()
+
+                return Response(
+                    {
+                        "message": "Transaction is pending for security review.",
+                        "status": "PENDING",
+                        "transaction_id": transaction_record.id,
+                        "balance": sender_wallet.balance
+                    },
+                    status=200
+                )
+
+            # 10. No fraud detected → SUCCESS
             with transaction.atomic():
                 sender_wallet.balance -= amount
                 receiver_wallet.balance += amount
@@ -103,32 +190,35 @@ class TransferMoneyView(APIView):
                 sender_wallet.save()
                 receiver_wallet.save()
 
-                # Audit record for Sender
-                sender_transaction = Transaction.objects.create(
-                    user=request.user,
-                    sender=request.user,
-                    receiver=receiver,
-                    transaction_type="TRANSFER",
-                    amount=amount,
-                    description=f"Transferred to {receiver.username}"
+                transaction_record.status = "SUCCESS"
+                transaction_record.description = (
+                    f"Transferred to {receiver.username}"
                 )
+                transaction_record.save()
 
-                detect_fraud(sender_transaction)
-
-                # Audit record for Recipient
+                # Recipient transaction history
                 Transaction.objects.create(
                     user=receiver,
                     sender=request.user,
                     receiver=receiver,
                     transaction_type="TRANSFER",
                     amount=amount,
+                    status="SUCCESS",
                     description=f"Received from {request.user.username}"
                 )
 
-            return Response({
-                "message": "Transfer successful.",
-                "balance": sender_wallet.balance
-            })
+            return Response(
+                {
+                    "message": "Transfer successful.",
+                    "status": "SUCCESS",
+                    "transaction_id": transaction_record.id,
+                    "balance": sender_wallet.balance
+                },
+                status=200
+            )
 
-        return Response(serializer.errors, status=400)
+        return Response(
+            serializer.errors,
+            status=400
+        )
 
