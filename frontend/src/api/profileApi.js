@@ -18,7 +18,7 @@ const authHeaders = () => ({
 
 export const getProfile = async () => {
     const response = await axios.get(
-        `${BASE_URL}/profile/`,
+        `${BASE_URL}/accounts/profile/`,
         authHeaders()
     );
 
@@ -27,14 +27,13 @@ export const getProfile = async () => {
 
 export const updateProfile = async (data) => {
     const response = await axios.put(
-        `${BASE_URL}/profile/`,
+        `${BASE_URL}/accounts/profile/`,
         data,
         authHeaders()
     );
 
     return response.data;
 };
-
 export const changePassword = async (data) => {
     const response = await axios.post(
         `${BASE_URL}/profile/change-password/`,

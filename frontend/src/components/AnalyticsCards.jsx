@@ -1,7 +1,6 @@
 import React from "react";
 
 const AnalyticsCards = ({ analytics }) => {
-
     if (!analytics) {
         return (
             <div className="alert alert-info">
@@ -11,79 +10,86 @@ const AnalyticsCards = ({ analytics }) => {
     }
 
     const cards = [
-
         {
-            title: "Transactions",
-            value: analytics.total_transactions,
-            color: "primary",
+            title: "Total Transactions",
+            value: analytics.total_transactions ?? 0,
             icon: "💳",
+            className: "analytics-blue",
         },
-
         {
-            title: "Deposits",
-            value: `₹${analytics.total_deposit}`,
-            color: "success",
+            title: "Total Deposits",
+            value: `₹${Number(analytics.total_deposit || 0).toLocaleString("en-IN")}`,
             icon: "⬇️",
+            className: "analytics-green",
         },
-
         {
-            title: "Withdrawals",
-            value: `₹${analytics.total_withdraw}`,
-            color: "warning",
+            title: "Total Withdrawals",
+            value: `₹${Number(analytics.total_withdraw || 0).toLocaleString("en-IN")}`,
             icon: "⬆️",
+            className: "analytics-red",
         },
-
         {
-            title: "Transfers",
-            value: `₹${analytics.total_transfer}`,
-            color: "info",
+            title: "Total Transfers",
+            value: `₹${Number(analytics.total_transfer || 0).toLocaleString("en-IN")}`,
             icon: "🔄",
+            className: "analytics-purple",
         },
-
+        {
+            title: "Successful",
+            value: analytics.successful_transactions ?? 0,
+            icon: "✅",
+            className: "analytics-success",
+        },
+        {
+            title: "Pending",
+            value: analytics.pending_transactions ?? 0,
+            icon: "🟡",
+            className: "analytics-warning",
+        },
+        {
+            title: "Failed",
+            value: analytics.failed_transactions ?? 0,
+            icon: "❌",
+            className: "analytics-danger",
+        },
         {
             title: "Fraud Alerts",
-            value: analytics.fraud_alerts,
-            color: "danger",
+            value: analytics.fraud_alerts ?? 0,
             icon: "🚨",
-        }
-
+            className: "analytics-fraud",
+        },
     ];
 
     return (
-
-        <div className="row">
+        <div className="row g-4">
 
             {cards.map((card, index) => (
-
                 <div
+                    className="col-xl-3 col-lg-4 col-md-6"
                     key={index}
-                    className="col-lg-3 col-md-6 mb-3"
                 >
+                    <div className={`analytics-card ${card.className}`}>
 
-                    <div className={`card border-${card.color} shadow`}>
+                        <div className="analytics-card-icon">
+                            {card.icon}
+                        </div>
 
-                        <div className="card-body text-center">
+                        <div>
+                            <p className="analytics-card-title">
+                                {card.title}
+                            </p>
 
-                            <h2>{card.icon}</h2>
-
-                            <h6>{card.title}</h6>
-
-                            <h3 className={`text-${card.color}`}>
+                            <h3 className="analytics-card-value">
                                 {card.value}
                             </h3>
-
                         </div>
 
                     </div>
-
                 </div>
-
             ))}
 
         </div>
-
     );
-
 };
 
 export default AnalyticsCards;

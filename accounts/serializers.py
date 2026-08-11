@@ -20,4 +20,5 @@ class UserListSerializer(serializers.ModelSerializer):
             "email",
             "is_active",
             "is_staff",
+            "is_frozen",
         ]

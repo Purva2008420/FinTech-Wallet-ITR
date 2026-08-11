@@ -1,0 +1,418 @@
+/* =========================================
+   Fraud Review Page
+========================================= */
+
+.fraud-review-page {
+    max-width: 1300px;
+}
+
+/* =========================================
+   Header
+========================================= */
+
+.fraud-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.fraud-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.fraud-title-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #dc3545, #842029);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.25);
+}
+
+/* =========================================
+   Loading
+========================================= */
+
+.fraud-loading-card {
+    background: white;
+    border-radius: 18px;
+    padding: 70px 20px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================
+   Messages
+========================================= */
+
+.fraud-message {
+    border-radius: 12px;
+}
+
+/* =========================================
+   Summary Cards
+========================================= */
+
+.fraud-summary-card {
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 110px;
+    transition: 0.25s ease;
+}
+
+.fraud-summary-card:hover {
+    transform: translateY(-4px);
+}
+
+.fraud-summary-card small {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.fraud-summary-card h3 {
+    margin: 4px 0 0;
+    font-weight: 700;
+}
+
+.fraud-summary-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+}
+
+.fraud-summary-card.pending {
+    background: #fff8e1;
+    border: 1px solid #ffe69c;
+}
+
+.fraud-summary-card.pending .fraud-summary-icon {
+    background: #ffe69c;
+}
+
+.fraud-summary-card.security {
+    background: #e8f5e9;
+    border: 1px solid #a3cfbb;
+}
+
+.fraud-summary-card.security .fraud-summary-icon {
+    background: #a3cfbb;
+}
+
+.fraud-summary-card.review {
+    background: #eef4ff;
+    border: 1px solid #b6d4fe;
+}
+
+.fraud-summary-card.review .fraud-summary-icon {
+    background: #b6d4fe;
+}
+
+/* =========================================
+   Review Notice
+========================================= */
+
+.fraud-review-notice {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #fff8e1;
+    border: 1px solid #ffe69c;
+    border-left: 5px solid #ffc107;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 25px;
+}
+
+.notice-icon {
+    font-size: 28px;
+}
+
+/* =========================================
+   Empty State
+========================================= */
+
+.fraud-empty-card {
+    background: white;
+    border-radius: 18px;
+    padding: 70px 20px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+}
+
+.fraud-empty-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+/* =========================================
+   Transaction Card
+========================================= */
+
+.fraud-transaction-card {
+    height: 100%;
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    transition: 0.25s ease;
+}
+
+.fraud-transaction-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.11);
+}
+
+/* =========================================
+   Card Header
+========================================= */
+
+.fraud-card-header {
+    background: linear-gradient(
+        135deg,
+        #212529,
+        #343a40
+    );
+    color: white;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fraud-card-header small {
+    opacity: 0.65;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.fraud-pending-badge {
+    background: #ffc107;
+    color: #212529;
+    border-radius: 20px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* =========================================
+   Amount
+========================================= */
+
+.fraud-amount-section {
+    padding: 25px 22px 18px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.fraud-amount-section small {
+    color: #6c757d;
+}
+
+.fraud-amount-section h1 {
+    font-size: 34px;
+    font-weight: 800;
+    margin: 5px 0 0;
+}
+
+/* =========================================
+   Details
+========================================= */
+
+.fraud-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 20px 22px;
+}
+
+.fraud-detail {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.fraud-detail span,
+.fraud-description span {
+    display: block;
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.fraud-detail strong {
+    font-size: 14px;
+    word-break: break-word;
+}
+
+/* =========================================
+   Description
+========================================= */
+
+.fraud-description {
+    margin: 0 22px 18px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.fraud-description p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* =========================================
+   Fraud Alert
+========================================= */
+
+.fraud-alert-section {
+    margin: 0 22px 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #ffecb5;
+}
+
+.fraud-alert-title {
+    background: #fff3cd;
+    padding: 12px 14px;
+    color: #664d03;
+}
+
+.fraud-alert-item {
+    background: #fffdf5;
+    padding: 14px;
+    border-top: 1px solid #ffecb5;
+}
+
+.fraud-alert-item p {
+    font-size: 14px;
+    color: #495057;
+}
+
+/* =========================================
+   Severity Badges
+========================================= */
+
+.fraud-severity-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.fraud-severity-high {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.fraud-severity-medium {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+.fraud-severity-low {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.fraud-severity-default {
+    background: #e9ecef;
+    color: #495057;
+}
+
+/* =========================================
+   Action Buttons
+========================================= */
+
+.fraud-actions {
+    display: flex;
+    gap: 12px;
+    padding: 18px 22px;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.fraud-actions button {
+    flex: 1;
+    min-height: 45px;
+}
+
+/* =========================================
+   Responsive
+========================================= */
+
+@media (max-width: 768px) {
+
+    .fraud-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .fraud-page-header button {
+        width: 100%;
+    }
+
+    .fraud-title-wrapper {
+        align-items: flex-start;
+    }
+
+    .fraud-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fraud-actions {
+        flex-direction: column;
+    }
+
+    .fraud-amount-section h1 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .fraud-title-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+
+    .fraud-page-header h2 {
+        font-size: 22px;
+    }
+
+    .fraud-summary-card {
+        min-height: 90px;
+    }
+
+    .fraud-card-header {
+        padding: 15px;
+    }
+
+    .fraud-details-grid {
+        padding: 15px;
+    }
+
+    .fraud-description,
+    .fraud-alert-section {
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+
+    .fraud-actions {
+        padding: 15px;
+    }
+}

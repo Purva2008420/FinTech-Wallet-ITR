@@ -58,6 +58,86 @@ class AddMoneyView(APIView):
             return Response({"message": "Money added successfully.", "new_balance": wallet.balance})
         return Response(serializer.errors, status=400)
 
+class WithdrawMoneyView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.is_frozen:
+            return Response(
+                {
+                    "error": "Your account has been frozen. Please contact the administrator."
+                },
+                status=403
+            )
+
+        serializer = AddMoneySerializer(data=request.data)
+
+        if serializer.is_valid():
+            amount = Decimal(
+                serializer.validated_data["amount"]
+            )
+
+            # 1. Validate amount
+            if amount <= 0:
+                return Response(
+                    {"error": "Amount must be greater than zero."},
+                    status=400
+                )
+
+            wallet = request.user.wallet
+
+            # 2. Check sufficient balance
+            if wallet.balance < amount:
+                failed_transaction = Transaction.objects.create(
+                    user=request.user,
+                    transaction_type="WITHDRAW",
+                    amount=amount,
+                    status="FAILED",
+                    description="Withdrawal failed: Insufficient balance."
+                )
+
+                return Response(
+                    {
+                        "message": "Withdrawal failed.",
+                        "status": "FAILED",
+                        "error": "Insufficient wallet balance.",
+                        "transaction_id": failed_transaction.id,
+                        "balance": wallet.balance
+                    },
+                    status=400
+                )
+
+            # 3. Deduct money safely
+            with transaction.atomic():
+
+                wallet.balance -= amount
+                wallet.save()
+
+                withdrawal_transaction = Transaction.objects.create(
+                    user=request.user,
+                    transaction_type="WITHDRAW",
+                    amount=amount,
+                    status="SUCCESS",
+                    description="Money withdrawn from wallet"
+                )
+
+            # 4. Run fraud detection
+            detect_fraud(withdrawal_transaction)
+
+            return Response(
+                {
+                    "message": "Withdrawal successful.",
+                    "status": "SUCCESS",
+                    "transaction_id": withdrawal_transaction.id,
+                    "balance": wallet.balance
+                },
+                status=200
+            )
+
+        return Response(
+            serializer.errors,
+            status=400
+        )
 class TransferMoneyView(APIView):
     permission_classes = [IsAuthenticated]
 

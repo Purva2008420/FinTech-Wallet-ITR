@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 
-import { getAnalytics } from "../api/profileApi";
+import Navbar from "../components/Navbar";
 
 import AnalyticsCards from "../components/AnalyticsCards";
 import TransactionChart from "../components/TransactionChart";
 import TransactionTypeChart from "../components/TransactionTypeChart";
 import FraudAnalyticsChart from "../components/FraudAnalyticsChart";
+
+import { getAnalytics } from "../api/profileApi";
+
+import "../styles/analytics.css";
 
 const AnalyticsDashboard = () => {
 
@@ -19,22 +23,31 @@ const AnalyticsDashboard = () => {
 
         try {
 
+            setLoading(true);
+            setError("");
+
             const data = await getAnalytics();
+
+            console.log("ANALYTICS DATA:", data);
 
             setAnalytics(data);
 
         } catch (err) {
 
-            console.error(err);
+            console.error(
+                "Analytics Error:",
+                err
+            );
 
-            setError("Unable to load analytics.");
+            setError(
+                "Unable to load analytics dashboard."
+            );
 
         } finally {
 
             setLoading(false);
 
         }
-
     };
 
     useEffect(() => {
@@ -43,68 +56,115 @@ const AnalyticsDashboard = () => {
 
     }, []);
 
-    if (loading) {
-
-        return (
-
-            <div className="container mt-5 text-center">
-
-                <div
-                    className="spinner-border text-primary"
-                    role="status"
-                >
-                </div>
-
-                <h5 className="mt-3">
-                    Loading Analytics...
-                </h5>
-
-            </div>
-
-        );
-
-    }
-
-    if (error) {
-
-        return (
-
-            <div className="container mt-5">
-
-                <div className="alert alert-danger">
-
-                    {error}
-
-                </div>
-
-            </div>
-
-        );
-
-    }
-
     return (
+        <div>
 
-        <div className="container mt-4">
+            <Navbar />
 
-            <h2 className="mb-4">
+            <div className="container analytics-page py-4">
 
-                📊 Analytics Dashboard
+                {/* Header */}
 
-            </h2>
+                <div className="analytics-header mb-4">
 
-            <AnalyticsCards analytics={analytics} />
+                    <div>
+                        <h2>
+                            📊 Analytics Dashboard
+                        </h2>
 
-            <TransactionChart analytics={analytics} />
+                        <p>
+                            Monitor transaction activity,
+                            financial flow and fraud status.
+                        </p>
+                    </div>
 
-            <TransactionTypeChart analytics={analytics} />
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={loadAnalytics}
+                    >
+                        🔄 Refresh
+                    </button>
 
-            <FraudAnalyticsChart analytics={analytics} />
+                </div>
+
+                {/* Error */}
+
+                {error && (
+                    <div className="alert alert-danger">
+                        {error}
+                    </div>
+                )}
+
+                {/* Loading */}
+
+                {loading ? (
+
+                    <div className="analytics-loading">
+
+                        <div
+                            className="spinner-border text-primary"
+                            role="status"
+                        />
+
+                        <p>
+                            Loading analytics...
+                        </p>
+
+                    </div>
+
+                ) : (
+
+                    <>
+                        {/* Summary Cards */}
+
+                        <AnalyticsCards
+                            analytics={analytics}
+                        />
+
+                        {/* Amount Chart */}
+
+                        <div className="row g-4 mt-1">
+
+                            <div className="col-12">
+
+                                <TransactionChart
+                                    analytics={analytics}
+                                />
+
+                            </div>
+
+                        </div>
+
+                        {/* Distribution Charts */}
+
+                        <div className="row g-4 mt-1">
+
+                            <div className="col-lg-6">
+
+                                <TransactionTypeChart
+                                    analytics={analytics}
+                                />
+
+                            </div>
+
+                            <div className="col-lg-6">
+
+                                <FraudAnalyticsChart
+                                    analytics={analytics}
+                                />
+
+                            </div>
+
+                        </div>
+
+                    </>
+
+                )}
+
+            </div>
 
         </div>
-
     );
-
 };
 
 export default AnalyticsDashboard;

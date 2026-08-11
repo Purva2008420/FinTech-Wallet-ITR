@@ -5,3 +5,6 @@ export const transferMoney = (data) =>
 
 export const getWallet = () =>
     api.get("wallet/");
+
+export const withdrawMoney = (data) =>
+    api.post("wallet/withdraw/", data);

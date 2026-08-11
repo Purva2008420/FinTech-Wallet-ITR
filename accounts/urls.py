@@ -6,7 +6,7 @@ from .views import (
     AdminDashboardView,
     CustomLoginView,
     FreezeUserView,
-    UnfreezeUserView, UserListView
+    UnfreezeUserView, UserListView, ChangePasswordView
 )
 
 urlpatterns = [
@@ -19,4 +19,9 @@ urlpatterns = [
     path("freeze/<int:user_id>/", FreezeUserView.as_view(), name="freeze_user"),
     path("unfreeze/<int:user_id>/", UnfreezeUserView.as_view(), name="unfreeze_user"),
     path("users/", UserListView.as_view(), name="user-list"),
+path(
+    "profile/change-password/",
+    ChangePasswordView.as_view(),
+    name="change-password"
+),
 ]

@@ -21,6 +21,23 @@ const TransactionTypeChart = ({ analytics }) => {
         return null;
     }
 
+    const depositCount = Number(
+        analytics.deposit_count || 0
+    );
+
+    const withdrawCount = Number(
+        analytics.withdraw_count || 0
+    );
+
+    const transferCount = Number(
+        analytics.transfer_count || 0
+    );
+
+    const total =
+        depositCount +
+        withdrawCount +
+        transferCount;
+
     const data = {
         labels: [
             "Deposits",
@@ -31,29 +48,76 @@ const TransactionTypeChart = ({ analytics }) => {
         datasets: [
             {
                 data: [
-                    Number(analytics.total_deposit),
-                    Number(analytics.total_withdraw),
-                    Number(analytics.total_transfer),
+                    depositCount,
+                    withdrawCount,
+                    transferCount,
                 ],
+
+                backgroundColor: [
+                    "#198754",
+                    "#dc3545",
+                    "#6f42c1",
+                ],
+
+                borderColor: "#ffffff",
+
+                borderWidth: 3,
+
+                hoverOffset: 8,
             },
         ],
     };
 
+    const options = {
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                position: "bottom",
+
+                labels: {
+                    padding: 20,
+                    usePointStyle: true,
+                },
+            },
+
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+
+                        const value = context.raw;
+
+                        const percentage =
+                            total > 0
+                                ? ((value / total) * 100).toFixed(1)
+                                : 0;
+
+                        return `${context.label}: ${value} (${percentage}%)`;
+                    },
+                },
+            },
+        },
+    };
+
     return (
-        <div className="card shadow mt-4">
+        <div className="analytics-chart-card">
 
-            <div className="card-header bg-success text-white">
-
-                <h5 className="mb-0">
-                    Transaction Distribution
-                </h5>
-
+            <div className="analytics-section-title">
+                <div>
+                    <h5>📊 Transaction Distribution</h5>
+                    <p>
+                        Distribution by transaction type
+                    </p>
+                </div>
             </div>
 
-            <div className="card-body">
-
-                <Pie data={data} />
-
+            <div className="analytics-pie-container">
+                <Pie
+                    data={data}
+                    options={options}
+                />
             </div>
 
         </div>

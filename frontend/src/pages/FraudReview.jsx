@@ -1,24 +1,35 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 
+import "../styles/fraud-review.css";
+
 const FraudReview = () => {
     const [pendingTransactions, setPendingTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [processingId, setProcessingId] = useState(null);
+
+    // =========================
+    // Fetch Pending Transactions
+    // =========================
 
     const fetchPendingTransactions = async () => {
         try {
             setLoading(true);
             setError("");
 
-           const response = await api.get("fraud-alerts/pending/");
+            const response = await api.get(
+                "fraud-alerts/pending/"
+            );
 
             setPendingTransactions(
                 response.data.pending_transactions || []
             );
 
         } catch (err) {
+            console.error(err);
+
             setError(
                 err.response?.data?.error ||
                 "Unable to load pending transactions."
@@ -32,27 +43,81 @@ const FraudReview = () => {
         fetchPendingTransactions();
     }, []);
 
-    const reviewTransaction = async (transactionId, action) => {
-        const actionText = action === "approve" ? "APPROVE" : "REJECT";
+    // =========================
+    // Severity Badge
+    // =========================
 
-const confirmed = window.confirm(
-    `Are you sure you want to ${actionText} transaction #${transactionId}?`
-);
+    const getSeverityClass = (severity) => {
+        switch (severity?.toUpperCase()) {
+            case "HIGH":
+                return "fraud-severity-high";
 
-if (!confirmed) return;
+            case "MEDIUM":
+                return "fraud-severity-medium";
+
+            case "LOW":
+                return "fraud-severity-low";
+
+            default:
+                return "fraud-severity-default";
+        }
+    };
+
+    const getSeverityIcon = (severity) => {
+        switch (severity?.toUpperCase()) {
+            case "HIGH":
+                return "🔴";
+
+            case "MEDIUM":
+                return "🟠";
+
+            case "LOW":
+                return "🟢";
+
+            default:
+                return "⚠️";
+        }
+    };
+
+    // =========================
+    // Review Transaction
+    // =========================
+
+    const reviewTransaction = async (
+        transactionId,
+        action
+    ) => {
+
+        const actionText =
+            action === "approve"
+                ? "APPROVE"
+                : "REJECT";
+
+        const confirmed = window.confirm(
+            `Are you sure you want to ${actionText} transaction #${transactionId}?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
         try {
 
+            setProcessingId(transactionId);
             setMessage("");
             setError("");
 
-        const response = await api.post(
-    `fraud-alerts/pending/${transactionId}/${action}/`,
-    {}
-);
+            const response = await api.post(
+                `fraud-alerts/pending/${transactionId}/${action}/`,
+                {}
+            );
 
-            setMessage(response.data.message);
+            setMessage(
+                response.data.message ||
+                `Transaction #${transactionId} reviewed successfully.`
+            );
 
-            // Remove the reviewed transaction from the list
+            // Remove reviewed transaction
             setPendingTransactions((current) =>
                 current.filter(
                     (transaction) =>
@@ -61,65 +126,195 @@ if (!confirmed) return;
             );
 
         } catch (err) {
+
+            console.error(err);
+
             setError(
                 err.response?.data?.error ||
                 "Unable to review transaction."
             );
+
+        } finally {
+            setProcessingId(null);
         }
     };
 
+    // =========================
+    // Loading
+    // =========================
+
     if (loading) {
         return (
-            <div className="container mt-4">
-                <h2>Pending Transaction Review</h2>
-                <p>Loading pending transactions...</p>
+            <div className="fraud-review-page container py-5">
+
+                <div className="fraud-loading-card">
+
+                    <div className="spinner-border text-danger" />
+
+                    <h5 className="mt-3 fw-bold">
+                        Loading Fraud Review Center
+                    </h5>
+
+                    <p className="text-muted mb-0">
+                        Checking for transactions requiring security review...
+                    </p>
+
+                </div>
+
             </div>
         );
     }
 
     return (
-    <div className="container mt-4">
+        <div className="fraud-review-page container py-4">
 
-        {/* Page Header */}
-        <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 className="fw-bold mb-1">
-                    🛡️ Fraud Review Center
-                </h2>
-                <p className="text-muted mb-0">
-                    Review and manage transactions flagged for security review.
-                </p>
+            {/* =========================
+                Header
+            ========================= */}
+
+            <div className="fraud-page-header">
+
+                <div>
+
+                    <div className="fraud-title-wrapper">
+
+                        <div className="fraud-title-icon">
+                            🛡️
+                        </div>
+
+                        <div>
+
+                            <h2 className="fw-bold mb-1">
+                                Fraud Review Center
+                            </h2>
+
+                            <p className="text-muted mb-0">
+                                Review transactions flagged by the security system.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <button
+                    className="btn btn-outline-primary fw-semibold"
+                    onClick={fetchPendingTransactions}
+                    disabled={loading}
+                >
+                    🔄 Refresh
+                </button>
+
             </div>
 
-            <button
-                className="btn btn-outline-primary"
-                onClick={fetchPendingTransactions}
-                disabled={loading}
-            >
-                🔄 Refresh
-            </button>
-        </div>
+            {/* =========================
+                Messages
+            ========================= */}
 
-        {/* Success Message */}
-        {message && (
-            <div className="alert alert-success shadow-sm">
-                ✅ {message}
+            {message && (
+                <div className="alert alert-success fraud-message shadow-sm">
+                    <strong>✅ Success</strong>
+                    <div>{message}</div>
+                </div>
+            )}
+
+            {error && (
+                <div className="alert alert-danger fraud-message shadow-sm">
+                    <strong>⚠️ Error</strong>
+                    <div>{error}</div>
+                </div>
+            )}
+
+            {/* =========================
+                Summary
+            ========================= */}
+
+            <div className="row g-3 mb-4">
+
+                <div className="col-md-4">
+
+                    <div className="fraud-summary-card pending">
+
+                        <div className="fraud-summary-icon">
+                            🟡
+                        </div>
+
+                        <div>
+
+                            <small>
+                                Pending Reviews
+                            </small>
+
+                            <h3>
+                                {pendingTransactions.length}
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div className="col-md-4">
+
+                    <div className="fraud-summary-card security">
+
+                        <div className="fraud-summary-icon">
+                            🛡️
+                        </div>
+
+                        <div>
+
+                            <small>
+                                Security Status
+                            </small>
+
+                            <h3>
+                                Active
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div className="col-md-4">
+
+                    <div className="fraud-summary-card review">
+
+                        <div className="fraud-summary-icon">
+                            🔍
+                        </div>
+
+                        <div>
+
+                            <small>
+                                Review Mode
+                            </small>
+
+                            <h3>
+                                Manual
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
-        )}
 
-        {/* Error Message */}
-        {error && (
-            <div className="alert alert-danger shadow-sm">
-                ⚠️ {error}
-            </div>
-        )}
+            {/* =========================
+                Empty State
+            ========================= */}
 
-        {/* Empty State */}
-        {pendingTransactions.length === 0 ? (
-            <div className="card shadow-sm border-0">
-                <div className="card-body text-center py-5">
+            {pendingTransactions.length === 0 ? (
 
-                    <div className="display-4 mb-3">
+                <div className="fraud-empty-card">
+
+                    <div className="fraud-empty-icon">
                         🛡️
                     </div>
 
@@ -127,160 +322,305 @@ if (!confirmed) return;
                         No Pending Transactions
                     </h4>
 
-                    <p className="text-muted mb-0">
-                        There are currently no transactions waiting
-                        for fraud review.
+                    <p className="text-muted mb-4">
+                        The security system currently has no
+                        transactions waiting for manual review.
                     </p>
 
-                </div>
-            </div>
-        ) : (
-            <>
-                {/* Summary */}
-                <div className="alert alert-warning shadow-sm">
-                    <strong>
-                        🟡 {pendingTransactions.length}
-                    </strong>{" "}
-                    transaction
-                    {pendingTransactions.length !== 1 ? "s" : ""}{" "}
-                    waiting for review.
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={fetchPendingTransactions}
+                    >
+                        🔄 Check Again
+                    </button>
+
                 </div>
 
-                {/* Transaction Cards */}
-                <div className="row">
+            ) : (
 
-                    {pendingTransactions.map((transaction) => (
+                <>
 
-                        <div
-                            className="col-lg-6 mb-4"
-                            key={transaction.id}
-                        >
+                    {/* Review Notice */}
 
-                            <div className="card shadow-sm h-100 border-0">
+                    <div className="fraud-review-notice">
 
-                                {/* Card Header */}
-                                <div className="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-                                    <strong>
-                                        Transaction #{transaction.id}
-                                    </strong>
+                        <div className="notice-icon">
+                            ⚠️
+                        </div>
 
-                                    <span className="badge bg-dark">
-                                        PENDING
-                                    </span>
-                                </div>
+                        <div>
 
-                                <div className="card-body">
+                            <strong>
+                                Transactions Require Attention
+                            </strong>
 
-                                    {/* Amount */}
-                                    <div className="mb-4">
-                                        <small className="text-muted">
-                                            Transaction Amount
-                                        </small>
-
-                                        <h2 className="fw-bold mb-0">
-                                            ₹{transaction.amount}
-                                        </h2>
-                                    </div>
-
-                                    {/* Transaction Details */}
-                                    <div className="mb-3">
-
-                                        <p className="mb-2">
-                                            <strong>From:</strong>{" "}
-                                            {transaction.sender || "N/A"}
-                                        </p>
-
-                                        <p className="mb-2">
-                                            <strong>To:</strong>{" "}
-                                            {transaction.receiver || "N/A"}
-                                        </p>
-
-                                        <p className="mb-2">
-                                            <strong>Description:</strong>{" "}
-                                            {transaction.description || "N/A"}
-                                        </p>
-
-                                    </div>
-
-                                    {/* Fraud Alerts */}
-                                    {transaction.fraud_alerts?.length > 0 && (
-                                        <div className="mt-3">
-
-                                            <h6 className="fw-bold">
-                                                ⚠️ Fraud Alerts
-                                            </h6>
-
-                                            {transaction.fraud_alerts.map(
-                                                (alert) => (
-                                                    <div
-                                                        key={alert.id}
-                                                        className="alert alert-warning mb-2"
-                                                    >
-                                                        <div className="d-flex justify-content-between align-items-center">
-
-                                                            <strong>
-                                                                {alert.severity}
-                                                            </strong>
-
-                                                            <span className="badge bg-warning text-dark">
-                                                                REVIEW
-                                                            </span>
-
-                                                        </div>
-
-                                                        <div className="mt-1">
-                                                            {alert.reason}
-                                                        </div>
-
-                                                    </div>
-                                                )
-                                            )}
-
-                                        </div>
-                                    )}
-
-                                    {/* Action Buttons */}
-                                    <div className="d-flex gap-2 mt-4">
-
-                                        <button
-                                            className="btn btn-success flex-grow-1 fw-bold"
-                                            onClick={() =>
-                                                reviewTransaction(
-                                                    transaction.id,
-                                                    "approve"
-                                                )
-                                            }
-                                        >
-                                            ✓ Approve
-                                        </button>
-
-                                        <button
-                                            className="btn btn-danger flex-grow-1 fw-bold"
-                                            onClick={() =>
-                                                reviewTransaction(
-                                                    transaction.id,
-                                                    "reject"
-                                                )
-                                            }
-                                        >
-                                            ✕ Reject
-                                        </button>
-
-                                    </div>
-
-                                </div>
-                            </div>
+                            <p className="mb-0">
+                                {pendingTransactions.length} transaction
+                                {pendingTransactions.length !== 1
+                                    ? "s are"
+                                    : " is"}{" "}
+                                currently waiting for manual security review.
+                            </p>
 
                         </div>
 
-                    ))}
+                    </div>
 
-                </div>
-            </>
-        )}
+                    {/* =========================
+                        Transaction Cards
+                    ========================= */}
 
-    </div>
-);
+                    <div className="row g-4">
+
+                        {pendingTransactions.map(
+                            (transaction) => {
+
+                                const firstAlert =
+                                    transaction.fraud_alerts?.[0];
+
+                                const severity =
+                                    firstAlert?.severity || "UNKNOWN";
+
+                                return (
+
+                                    <div
+                                        className="col-xl-6"
+                                        key={transaction.id}
+                                    >
+
+                                        <div className="fraud-transaction-card">
+
+                                            {/* Card Header */}
+
+                                            <div className="fraud-card-header">
+
+                                                <div>
+
+                                                    <small>
+                                                        TRANSACTION
+                                                    </small>
+
+                                                    <h5 className="fw-bold mb-0">
+                                                        #{transaction.id}
+                                                    </h5>
+
+                                                </div>
+
+                                                <span className="fraud-pending-badge">
+                                                    🟡 PENDING
+                                                </span>
+
+                                            </div>
+
+                                            {/* Amount */}
+
+                                            <div className="fraud-amount-section">
+
+                                                <small>
+                                                    Transaction Amount
+                                                </small>
+
+                                                <h1>
+                                                    ₹
+                                                    {Number(
+                                                        transaction.amount || 0
+                                                    ).toLocaleString("en-IN", {
+                                                        minimumFractionDigits: 2,
+                                                    })}
+                                                </h1>
+
+                                            </div>
+
+                                            {/* Details */}
+
+                                            <div className="fraud-details-grid">
+
+                                                <div className="fraud-detail">
+
+                                                    <span>
+                                                        Sender
+                                                    </span>
+
+                                                    <strong>
+                                                        👤{" "}
+                                                        {transaction.sender ||
+                                                            "N/A"}
+                                                    </strong>
+
+                                                </div>
+
+                                                <div className="fraud-detail">
+
+                                                    <span>
+                                                        Receiver
+                                                    </span>
+
+                                                    <strong>
+                                                        👤{" "}
+                                                        {transaction.receiver ||
+                                                            "N/A"}
+                                                    </strong>
+
+                                                </div>
+
+                                                <div className="fraud-detail">
+
+                                                    <span>
+                                                        Transaction Type
+                                                    </span>
+
+                                                    <strong>
+                                                        {transaction.transaction_type ||
+                                                            "TRANSFER"}
+                                                    </strong>
+
+                                                </div>
+
+                                                <div className="fraud-detail">
+
+                                                    <span>
+                                                        Transaction ID
+                                                    </span>
+
+                                                    <strong>
+                                                        #{transaction.id}
+                                                    </strong>
+
+                                                </div>
+
+                                            </div>
+
+                                            {/* Description */}
+
+                                            <div className="fraud-description">
+
+                                                <span>
+                                                    Description
+                                                </span>
+
+                                                <p>
+                                                    {transaction.description ||
+                                                        "No description provided."}
+                                                </p>
+
+                                            </div>
+
+                                            {/* Fraud Alert */}
+
+                                            {transaction.fraud_alerts?.length >
+                                                0 && (
+
+                                                <div className="fraud-alert-section">
+
+                                                    <div className="fraud-alert-title">
+
+                                                        <strong>
+                                                            🚨 Security Alert
+                                                        </strong>
+
+                                                    </div>
+
+                                                    {transaction.fraud_alerts.map(
+                                                        (alert) => (
+
+                                                            <div
+                                                                className="fraud-alert-item"
+                                                                key={alert.id}
+                                                            >
+
+                                                                <div className="d-flex justify-content-between align-items-center mb-2">
+
+                                                                    <span
+                                                                        className={`fraud-severity-badge ${getSeverityClass(
+                                                                            alert.severity
+                                                                        )}`}
+                                                                    >
+                                                                        {getSeverityIcon(
+                                                                            alert.severity
+                                                                        )}{" "}
+                                                                        {alert.severity ||
+                                                                            "UNKNOWN"}
+                                                                    </span>
+
+                                                                    <span className="badge bg-dark">
+                                                                        REVIEW
+                                                                    </span>
+
+                                                                </div>
+
+                                                                <p className="mb-0">
+                                                                    {alert.reason ||
+                                                                        "Suspicious activity detected."}
+                                                                </p>
+
+                                                            </div>
+
+                                                        )
+                                                    )}
+
+                                                </div>
+
+                                            )}
+
+                                            {/* Actions */}
+
+                                            <div className="fraud-actions">
+
+                                                <button
+                                                    className="btn btn-success fw-bold"
+                                                    disabled={
+                                                        processingId ===
+                                                        transaction.id
+                                                    }
+                                                    onClick={() =>
+                                                        reviewTransaction(
+                                                            transaction.id,
+                                                            "approve"
+                                                        )
+                                                    }
+                                                >
+                                                    {processingId ===
+                                                    transaction.id
+                                                        ? "Processing..."
+                                                        : "✓ Approve Transaction"}
+                                                </button>
+
+                                                <button
+                                                    className="btn btn-danger fw-bold"
+                                                    disabled={
+                                                        processingId ===
+                                                        transaction.id
+                                                    }
+                                                    onClick={() =>
+                                                        reviewTransaction(
+                                                            transaction.id,
+                                                            "reject"
+                                                        )
+                                                    }
+                                                >
+                                                    {processingId ===
+                                                    transaction.id
+                                                        ? "Processing..."
+                                                        : "✕ Reject Transaction"}
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                );
+                            }
+                        )}
+
+                    </div>
+
+                </>
+            )}
+
+        </div>
+    );
 };
 
 export default FraudReview;

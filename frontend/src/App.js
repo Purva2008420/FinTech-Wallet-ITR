@@ -13,32 +13,98 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import Profile from "./pages/Profile";
 import FraudReview from "./pages/FraudReview";
+import AdminRoute from "./components/AdminRoute";
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          {/* Public Entrance Gates */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+       <Routes>
 
-          {/* Shield Protected Workspace Routes */}
-          <Route path="/dashboard" element={
+    {/* Public Routes */}
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+
+    {/* Normal User Routes */}
+    <Route
+        path="/dashboard"
+        element={
             <ProtectedRoute>
-              <Dashboard />
+                <Dashboard />
             </ProtectedRoute>
-          } />
+        }
+    />
 
-          {/* Fallback Catch-All Router Target */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-          <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
-          <Route path="/transfer" element={<ProtectedRoute><Transfer /></ProtectedRoute>} />
-          <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
-          <Route path="/admin" element={<AdminDashboard />}/>
-          <Route path="/analytics" element={<AnalyticsDashboard />}/>
-          <Route path="/profile" element={<Profile />}/>
-          <Route path="/fraud-review" element={<ProtectedRoute adminOnly><FraudReview /></ProtectedRoute>}/>
-        </Routes>
+    <Route
+        path="/wallet"
+        element={
+            <ProtectedRoute>
+                <Wallet />
+            </ProtectedRoute>
+        }
+    />
+
+    <Route
+        path="/transfer"
+        element={
+            <ProtectedRoute>
+                <Transfer />
+            </ProtectedRoute>
+        }
+    />
+
+    <Route
+        path="/transactions"
+        element={
+            <ProtectedRoute>
+                <Transactions />
+            </ProtectedRoute>
+        }
+    />
+
+    <Route
+        path="/profile"
+        element={
+            <ProtectedRoute>
+                <Profile />
+            </ProtectedRoute>
+        }
+    />
+
+    {/* Admin Routes */}
+    <Route
+        path="/admin"
+        element={
+            <AdminRoute>
+                <AdminDashboard />
+            </AdminRoute>
+        }
+    />
+
+    <Route
+        path="/analytics"
+        element={
+            <AdminRoute>
+                <AnalyticsDashboard />
+            </AdminRoute>
+        }
+    />
+
+    <Route
+        path="/fraud-review"
+        element={
+            <AdminRoute>
+                <FraudReview />
+            </AdminRoute>
+        }
+    />
+
+    {/* Catch-All */}
+    <Route
+        path="*"
+        element={<Navigate to="/login" replace />}
+    />
+
+</Routes>
       </Router>
     </AuthProvider>
   );

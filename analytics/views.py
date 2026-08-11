@@ -43,8 +43,25 @@ class AnalyticsDashboardView(APIView):
             status="FAILED"
         ).count()
 
+        pending_transactions = Transaction.objects.filter(
+            status="PENDING"
+        ).count()
         fraud_alerts = FraudAlert.objects.count()
 
+        deposit_count = Transaction.objects.filter(
+            transaction_type="DEPOSIT",
+            status="SUCCESS"
+        ).count()
+
+        withdraw_count = Transaction.objects.filter(
+            transaction_type="WITHDRAW",
+            status="SUCCESS"
+        ).count()
+
+        transfer_count = Transaction.objects.filter(
+            transaction_type="TRANSFER",
+            status="SUCCESS"
+        ).count()
         data = {
             "total_transactions": total_transactions,
             "total_deposit": total_deposit,
@@ -52,6 +69,10 @@ class AnalyticsDashboardView(APIView):
             "total_transfer": total_transfer,
             "successful_transactions": successful_transactions,
             "failed_transactions": failed_transactions,
+            "pending_transactions": pending_transactions,
+            "deposit_count": deposit_count,
+            "withdraw_count": withdraw_count,
+            "transfer_count": transfer_count,
             "fraud_alerts": fraud_alerts,
         }
 
