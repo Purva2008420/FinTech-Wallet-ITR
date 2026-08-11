@@ -1,0 +1,51 @@
+.transfer-card {
+    border-radius: 18px;
+}
+
+.transfer-icon {
+    font-size: 42px;
+}
+
+.balance-card {
+    border-radius: 18px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+.security-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.security-item > span {
+    font-size: 24px;
+}
+
+.security-item strong {
+    font-size: 14px;
+}
+
+.security-item small {
+    margin-top: 3px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 9px;
+}
+
+.btn {
+    border-radius: 9px;
+}
+
+.card {
+    border-radius: 14px;
+}
+
+@media (max-width: 768px) {
+
+    .transfer-icon {
+        font-size: 32px;
+    }
+
+}

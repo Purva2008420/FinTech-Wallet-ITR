@@ -1,0 +1,244 @@
+.container {
+    max-width: 1300px;
+}
+
+.dashboard-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+.badge {
+    font-size: 0.85rem;
+}
+
+.btn {
+    min-width: 90px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+/* ==========================
+   Admin Statistics Cards
+   ========================== */
+
+.admin-stat-card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10) !important;
+}
+
+
+/* ==========================
+   Admin Dashboard
+   ========================== */
+
+.admin-dashboard {
+    padding-bottom: 40px;
+}
+
+
+/* ==========================
+   Responsive
+   ========================== */
+
+@media (max-width: 768px) {
+
+    .admin-stat-card {
+        margin-bottom: 5px;
+    }
+
+}
+/* ==========================
+   Admin Dashboard
+   ========================== */
+
+.admin-dashboard {
+    padding-bottom: 40px;
+}
+
+
+/* ==========================
+   Admin Header
+   ========================== */
+
+.admin-header {
+    overflow: hidden;
+}
+
+
+/* ==========================
+   Statistics / Monitoring
+   ========================== */
+
+.security-stat-icon {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 19px;
+}
+
+
+/* ==========================
+   Admin Cards
+   ========================== */
+
+.admin-dashboard .card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.admin-dashboard .card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.08) !important;
+}
+
+
+/* ==========================
+   Responsive
+   ========================== */
+
+@media (max-width: 768px) {
+
+    .admin-header .btn {
+        width: 100%;
+    }
+
+    .security-stat-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+}
+/* ==========================================
+   ADMIN QUICK OPERATIONS
+   ========================================== */
+
+.admin-operation-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 18px;
+
+    background: #f8f9fa;
+
+    border: 1px solid #e9ecef;
+
+    border-radius: 14px;
+
+    text-align: left;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+
+    cursor: pointer;
+}
+
+.admin-operation-card:hover {
+    transform: translateY(-3px);
+
+    background: #ffffff;
+
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+}
+
+.admin-operation-icon {
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eaf2ff;
+
+    border-radius: 12px;
+
+    font-size: 23px;
+}
+
+
+/* ==========================================
+   ADMIN TABLES
+   ========================================== */
+
+#user-management,
+#fraud-alerts {
+    scroll-margin-top: 20px;
+}
+
+#user-management .card,
+#fraud-alerts .card {
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+#user-management .card-header,
+#fraud-alerts .card-header {
+    padding: 18px 20px;
+}
+
+#user-management .table,
+#fraud-alerts .table {
+    margin-bottom: 0;
+}
+
+#user-management .table th,
+#fraud-alerts .table th {
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+#user-management .table td,
+#fraud-alerts .table td {
+    vertical-align: middle;
+}
+
+
+/* ==========================================
+   ADMIN RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+
+    .admin-operation-card {
+        padding: 15px;
+    }
+
+}

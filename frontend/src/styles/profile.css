@@ -1,0 +1,69 @@
+.profile-page {
+    max-width: 1000px;
+    padding-bottom: 40px;
+}
+
+.profile-page .card {
+    border-radius: 16px;
+}
+
+.profile-page .card-header {
+    font-weight: bold;
+}
+
+.profile-info-box {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px 18px;
+    border: 1px solid #e9ecef;
+    min-height: 75px;
+    transition: all 0.2s ease;
+}
+
+.profile-info-box:hover {
+    background: #f1f5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.profile-info-box strong {
+    display: block;
+    margin-top: 5px;
+}
+
+.modal {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.modal-content {
+    border-radius: 16px;
+    border: none;
+}
+
+.btn {
+    border-radius: 9px;
+}
+
+.badge {
+    border-radius: 8px;
+}
+
+
+/* ==========================
+   Responsive
+   ========================== */
+
+@media (max-width: 768px) {
+
+    .profile-page {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .profile-page > .d-flex {
+        align-items: flex-start !important;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+}

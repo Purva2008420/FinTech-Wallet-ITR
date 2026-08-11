@@ -1,0 +1,21 @@
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# React dependencies
+frontend/node_modules/
+
+# Environment variables
+.env
+
+# IDE files
+.idea/
+
+# Python generated files
+*.log
